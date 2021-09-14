@@ -1,0 +1,1030 @@
+   0  $accept : Program $end
+
+   1  Program : MAINCLASS ID '{' PUBLIC STATIC VOID MAIN '(' ')' CompStmt '}'
+   2          |
+
+   3  CompStmt : '{' StmtList '}'
+
+   4  StmtList : StmtList Stmt
+   5           |
+
+   6  Stmt : AssignStmt
+   7       | ForStmt
+   8       | WhileStmt
+   9       | IfStmt
+  10       | CompStmt
+  11       | Decleration
+  12       | NullStmt
+  13       | PRINTLN '(' Expr ')'
+
+  14  Decleration : Type IdList ';'
+
+  15  Type : INT
+  16       | FLOAT
+
+  17  IdList : DecId ',' IdList
+  18         | DecId
+
+  19  DecId : ID
+
+  20  NullStmt : ';'
+
+  21  AssignStmt : AssignExpr ';'
+
+  22  AssignExpr : AssId '=' Expr
+
+  23  AssId : ID
+
+  24  Expr : AssignExpr
+  25       | RVal
+
+  26  ForStmt : FOR '(' OpAssignExpr ';' OpBoolExpr ';' OpAssignExpr ')' Stmt
+
+  27  OpAssignExpr : AssignExpr
+  28               |
+
+  29  OpBoolExpr : BoolExpr
+  30             |
+
+  31  WhileStmt : WHILE '(' BoolExpr ')' Stmt
+
+  32  IfStmt : IF '(' BoolExpr ')' Stmt ElsePart
+
+  33  ElsePart : ELSE Stmt
+  34           |
+
+  35  BoolExpr : Expr CompOp Expr
+
+  36  CompOp : EQ
+  37         | '<'
+  38         | '>'
+  39         | LE
+  40         | GE
+  41         | NEQ
+
+  42  RVal : RVal '+' Term
+  43       | RVal '-' Term
+  44       | Term
+
+  45  Term : Term '*' Factor
+  46       | Term '/' Factor
+  47       | Factor
+
+  48  Factor : '(' Expr ')'
+  49         | '-' Factor
+  50         | AssId
+  51         | NUM
+
+state 0
+	$accept : . Program $end  (0)
+	Program : .  (2)
+
+	MAINCLASS  shift 1
+	$end  reduce 2
+
+	Program  goto 2
+
+
+state 1
+	Program : MAINCLASS . ID '{' PUBLIC STATIC VOID MAIN '(' ')' CompStmt '}'  (1)
+
+	ID  shift 3
+	.  error
+
+
+state 2
+	$accept : Program . $end  (0)
+
+	$end  accept
+
+
+state 3
+	Program : MAINCLASS ID . '{' PUBLIC STATIC VOID MAIN '(' ')' CompStmt '}'  (1)
+
+	'{'  shift 4
+	.  error
+
+
+state 4
+	Program : MAINCLASS ID '{' . PUBLIC STATIC VOID MAIN '(' ')' CompStmt '}'  (1)
+
+	PUBLIC  shift 5
+	.  error
+
+
+state 5
+	Program : MAINCLASS ID '{' PUBLIC . STATIC VOID MAIN '(' ')' CompStmt '}'  (1)
+
+	STATIC  shift 6
+	.  error
+
+
+state 6
+	Program : MAINCLASS ID '{' PUBLIC STATIC . VOID MAIN '(' ')' CompStmt '}'  (1)
+
+	VOID  shift 7
+	.  error
+
+
+state 7
+	Program : MAINCLASS ID '{' PUBLIC STATIC VOID . MAIN '(' ')' CompStmt '}'  (1)
+
+	MAIN  shift 8
+	.  error
+
+
+state 8
+	Program : MAINCLASS ID '{' PUBLIC STATIC VOID MAIN . '(' ')' CompStmt '}'  (1)
+
+	'('  shift 9
+	.  error
+
+
+state 9
+	Program : MAINCLASS ID '{' PUBLIC STATIC VOID MAIN '(' . ')' CompStmt '}'  (1)
+
+	')'  shift 10
+	.  error
+
+
+state 10
+	Program : MAINCLASS ID '{' PUBLIC STATIC VOID MAIN '(' ')' . CompStmt '}'  (1)
+
+	'{'  shift 11
+	.  error
+
+	CompStmt  goto 12
+
+
+state 11
+	CompStmt : '{' . StmtList '}'  (3)
+	StmtList : .  (5)
+
+	.  reduce 5
+
+	StmtList  goto 13
+
+
+state 12
+	Program : MAINCLASS ID '{' PUBLIC STATIC VOID MAIN '(' ')' CompStmt . '}'  (1)
+
+	'}'  shift 14
+	.  error
+
+
+state 13
+	CompStmt : '{' StmtList . '}'  (3)
+	StmtList : StmtList . Stmt  (4)
+
+	INT  shift 15
+	FLOAT  shift 16
+	PRINTLN  shift 17
+	FOR  shift 18
+	WHILE  shift 19
+	IF  shift 20
+	ID  shift 21
+	'{'  shift 11
+	'}'  shift 22
+	';'  shift 23
+	.  error
+
+	CompStmt  goto 24
+	Stmt  goto 25
+	Decleration  goto 26
+	Type  goto 27
+	NullStmt  goto 28
+	AssignStmt  goto 29
+	ForStmt  goto 30
+	WhileStmt  goto 31
+	IfStmt  goto 32
+	AssignExpr  goto 33
+	AssId  goto 34
+
+
+state 14
+	Program : MAINCLASS ID '{' PUBLIC STATIC VOID MAIN '(' ')' CompStmt '}' .  (1)
+
+	.  reduce 1
+
+
+state 15
+	Type : INT .  (15)
+
+	.  reduce 15
+
+
+state 16
+	Type : FLOAT .  (16)
+
+	.  reduce 16
+
+
+state 17
+	Stmt : PRINTLN . '(' Expr ')'  (13)
+
+	'('  shift 35
+	.  error
+
+
+state 18
+	ForStmt : FOR . '(' OpAssignExpr ';' OpBoolExpr ';' OpAssignExpr ')' Stmt  (26)
+
+	'('  shift 36
+	.  error
+
+
+state 19
+	WhileStmt : WHILE . '(' BoolExpr ')' Stmt  (31)
+
+	'('  shift 37
+	.  error
+
+
+state 20
+	IfStmt : IF . '(' BoolExpr ')' Stmt ElsePart  (32)
+
+	'('  shift 38
+	.  error
+
+
+state 21
+	AssId : ID .  (23)
+
+	.  reduce 23
+
+
+state 22
+	CompStmt : '{' StmtList '}' .  (3)
+
+	.  reduce 3
+
+
+state 23
+	NullStmt : ';' .  (20)
+
+	.  reduce 20
+
+
+state 24
+	Stmt : CompStmt .  (10)
+
+	.  reduce 10
+
+
+state 25
+	StmtList : StmtList Stmt .  (4)
+
+	.  reduce 4
+
+
+state 26
+	Stmt : Decleration .  (11)
+
+	.  reduce 11
+
+
+state 27
+	Decleration : Type . IdList ';'  (14)
+
+	ID  shift 39
+	.  error
+
+	IdList  goto 40
+	DecId  goto 41
+
+
+state 28
+	Stmt : NullStmt .  (12)
+
+	.  reduce 12
+
+
+state 29
+	Stmt : AssignStmt .  (6)
+
+	.  reduce 6
+
+
+state 30
+	Stmt : ForStmt .  (7)
+
+	.  reduce 7
+
+
+state 31
+	Stmt : WhileStmt .  (8)
+
+	.  reduce 8
+
+
+state 32
+	Stmt : IfStmt .  (9)
+
+	.  reduce 9
+
+
+state 33
+	AssignStmt : AssignExpr . ';'  (21)
+
+	';'  shift 42
+	.  error
+
+
+state 34
+	AssignExpr : AssId . '=' Expr  (22)
+
+	'='  shift 43
+	.  error
+
+
+state 35
+	Stmt : PRINTLN '(' . Expr ')'  (13)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssignExpr  goto 47
+	AssId  goto 48
+	Expr  goto 49
+	RVal  goto 50
+	Term  goto 51
+	Factor  goto 52
+
+
+state 36
+	ForStmt : FOR '(' . OpAssignExpr ';' OpBoolExpr ';' OpAssignExpr ')' Stmt  (26)
+	OpAssignExpr : .  (28)
+
+	ID  shift 21
+	';'  reduce 28
+
+	AssignExpr  goto 53
+	AssId  goto 34
+	OpAssignExpr  goto 54
+
+
+state 37
+	WhileStmt : WHILE '(' . BoolExpr ')' Stmt  (31)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	BoolExpr  goto 55
+	AssignExpr  goto 47
+	AssId  goto 48
+	Expr  goto 56
+	RVal  goto 50
+	Term  goto 51
+	Factor  goto 52
+
+
+state 38
+	IfStmt : IF '(' . BoolExpr ')' Stmt ElsePart  (32)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	BoolExpr  goto 57
+	AssignExpr  goto 47
+	AssId  goto 48
+	Expr  goto 56
+	RVal  goto 50
+	Term  goto 51
+	Factor  goto 52
+
+
+state 39
+	DecId : ID .  (19)
+
+	.  reduce 19
+
+
+state 40
+	Decleration : Type IdList . ';'  (14)
+
+	';'  shift 58
+	.  error
+
+
+state 41
+	IdList : DecId . ',' IdList  (17)
+	IdList : DecId .  (18)
+
+	','  shift 59
+	';'  reduce 18
+
+
+state 42
+	AssignStmt : AssignExpr ';' .  (21)
+
+	.  reduce 21
+
+
+state 43
+	AssignExpr : AssId '=' . Expr  (22)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssignExpr  goto 47
+	AssId  goto 48
+	Expr  goto 60
+	RVal  goto 50
+	Term  goto 51
+	Factor  goto 52
+
+
+state 44
+	Factor : NUM .  (51)
+
+	.  reduce 51
+
+
+state 45
+	Factor : '(' . Expr ')'  (48)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssignExpr  goto 47
+	AssId  goto 48
+	Expr  goto 61
+	RVal  goto 50
+	Term  goto 51
+	Factor  goto 52
+
+
+state 46
+	Factor : '-' . Factor  (49)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssId  goto 62
+	Factor  goto 63
+
+
+state 47
+	Expr : AssignExpr .  (24)
+
+	.  reduce 24
+
+
+state 48
+	AssignExpr : AssId . '=' Expr  (22)
+	Factor : AssId .  (50)
+
+	'='  shift 43
+	EQ  reduce 50
+	NEQ  reduce 50
+	LE  reduce 50
+	GE  reduce 50
+	')'  reduce 50
+	';'  reduce 50
+	'<'  reduce 50
+	'>'  reduce 50
+	'+'  reduce 50
+	'-'  reduce 50
+	'*'  reduce 50
+	'/'  reduce 50
+
+
+state 49
+	Stmt : PRINTLN '(' Expr . ')'  (13)
+
+	')'  shift 64
+	.  error
+
+
+state 50
+	Expr : RVal .  (25)
+	RVal : RVal . '+' Term  (42)
+	RVal : RVal . '-' Term  (43)
+
+	'+'  shift 65
+	'-'  shift 66
+	EQ  reduce 25
+	NEQ  reduce 25
+	LE  reduce 25
+	GE  reduce 25
+	')'  reduce 25
+	';'  reduce 25
+	'<'  reduce 25
+	'>'  reduce 25
+
+
+state 51
+	RVal : Term .  (44)
+	Term : Term . '*' Factor  (45)
+	Term : Term . '/' Factor  (46)
+
+	'*'  shift 67
+	'/'  shift 68
+	EQ  reduce 44
+	NEQ  reduce 44
+	LE  reduce 44
+	GE  reduce 44
+	')'  reduce 44
+	';'  reduce 44
+	'<'  reduce 44
+	'>'  reduce 44
+	'+'  reduce 44
+	'-'  reduce 44
+
+
+state 52
+	Term : Factor .  (47)
+
+	.  reduce 47
+
+
+state 53
+	OpAssignExpr : AssignExpr .  (27)
+
+	.  reduce 27
+
+
+state 54
+	ForStmt : FOR '(' OpAssignExpr . ';' OpBoolExpr ';' OpAssignExpr ')' Stmt  (26)
+
+	';'  shift 69
+	.  error
+
+
+state 55
+	WhileStmt : WHILE '(' BoolExpr . ')' Stmt  (31)
+
+	')'  shift 70
+	.  error
+
+
+state 56
+	BoolExpr : Expr . CompOp Expr  (35)
+
+	EQ  shift 71
+	NEQ  shift 72
+	LE  shift 73
+	GE  shift 74
+	'<'  shift 75
+	'>'  shift 76
+	.  error
+
+	CompOp  goto 77
+
+
+state 57
+	IfStmt : IF '(' BoolExpr . ')' Stmt ElsePart  (32)
+
+	')'  shift 78
+	.  error
+
+
+state 58
+	Decleration : Type IdList ';' .  (14)
+
+	.  reduce 14
+
+
+state 59
+	IdList : DecId ',' . IdList  (17)
+
+	ID  shift 39
+	.  error
+
+	IdList  goto 79
+	DecId  goto 41
+
+
+state 60
+	AssignExpr : AssId '=' Expr .  (22)
+
+	.  reduce 22
+
+
+state 61
+	Factor : '(' Expr . ')'  (48)
+
+	')'  shift 80
+	.  error
+
+
+state 62
+	Factor : AssId .  (50)
+
+	.  reduce 50
+
+
+state 63
+	Factor : '-' Factor .  (49)
+
+	.  reduce 49
+
+
+state 64
+	Stmt : PRINTLN '(' Expr ')' .  (13)
+
+	.  reduce 13
+
+
+state 65
+	RVal : RVal '+' . Term  (42)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssId  goto 62
+	Term  goto 81
+	Factor  goto 52
+
+
+state 66
+	RVal : RVal '-' . Term  (43)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssId  goto 62
+	Term  goto 82
+	Factor  goto 52
+
+
+state 67
+	Term : Term '*' . Factor  (45)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssId  goto 62
+	Factor  goto 83
+
+
+state 68
+	Term : Term '/' . Factor  (46)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssId  goto 62
+	Factor  goto 84
+
+
+state 69
+	ForStmt : FOR '(' OpAssignExpr ';' . OpBoolExpr ';' OpAssignExpr ')' Stmt  (26)
+	OpBoolExpr : .  (30)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	';'  reduce 30
+
+	BoolExpr  goto 85
+	AssignExpr  goto 47
+	AssId  goto 48
+	Expr  goto 56
+	OpBoolExpr  goto 86
+	RVal  goto 50
+	Term  goto 51
+	Factor  goto 52
+
+
+state 70
+	WhileStmt : WHILE '(' BoolExpr ')' . Stmt  (31)
+
+	INT  shift 15
+	FLOAT  shift 16
+	PRINTLN  shift 17
+	FOR  shift 18
+	WHILE  shift 19
+	IF  shift 20
+	ID  shift 21
+	'{'  shift 11
+	';'  shift 23
+	.  error
+
+	CompStmt  goto 24
+	Stmt  goto 87
+	Decleration  goto 26
+	Type  goto 27
+	NullStmt  goto 28
+	AssignStmt  goto 29
+	ForStmt  goto 30
+	WhileStmt  goto 31
+	IfStmt  goto 32
+	AssignExpr  goto 33
+	AssId  goto 34
+
+
+state 71
+	CompOp : EQ .  (36)
+
+	.  reduce 36
+
+
+state 72
+	CompOp : NEQ .  (41)
+
+	.  reduce 41
+
+
+state 73
+	CompOp : LE .  (39)
+
+	.  reduce 39
+
+
+state 74
+	CompOp : GE .  (40)
+
+	.  reduce 40
+
+
+state 75
+	CompOp : '<' .  (37)
+
+	.  reduce 37
+
+
+state 76
+	CompOp : '>' .  (38)
+
+	.  reduce 38
+
+
+state 77
+	BoolExpr : Expr CompOp . Expr  (35)
+
+	ID  shift 21
+	NUM  shift 44
+	'('  shift 45
+	'-'  shift 46
+	.  error
+
+	AssignExpr  goto 47
+	AssId  goto 48
+	Expr  goto 88
+	RVal  goto 50
+	Term  goto 51
+	Factor  goto 52
+
+
+state 78
+	IfStmt : IF '(' BoolExpr ')' . Stmt ElsePart  (32)
+
+	INT  shift 15
+	FLOAT  shift 16
+	PRINTLN  shift 17
+	FOR  shift 18
+	WHILE  shift 19
+	IF  shift 20
+	ID  shift 21
+	'{'  shift 11
+	';'  shift 23
+	.  error
+
+	CompStmt  goto 24
+	Stmt  goto 89
+	Decleration  goto 26
+	Type  goto 27
+	NullStmt  goto 28
+	AssignStmt  goto 29
+	ForStmt  goto 30
+	WhileStmt  goto 31
+	IfStmt  goto 32
+	AssignExpr  goto 33
+	AssId  goto 34
+
+
+state 79
+	IdList : DecId ',' IdList .  (17)
+
+	.  reduce 17
+
+
+state 80
+	Factor : '(' Expr ')' .  (48)
+
+	.  reduce 48
+
+
+state 81
+	RVal : RVal '+' Term .  (42)
+	Term : Term . '*' Factor  (45)
+	Term : Term . '/' Factor  (46)
+
+	'*'  shift 67
+	'/'  shift 68
+	EQ  reduce 42
+	NEQ  reduce 42
+	LE  reduce 42
+	GE  reduce 42
+	')'  reduce 42
+	';'  reduce 42
+	'<'  reduce 42
+	'>'  reduce 42
+	'+'  reduce 42
+	'-'  reduce 42
+
+
+state 82
+	RVal : RVal '-' Term .  (43)
+	Term : Term . '*' Factor  (45)
+	Term : Term . '/' Factor  (46)
+
+	'*'  shift 67
+	'/'  shift 68
+	EQ  reduce 43
+	NEQ  reduce 43
+	LE  reduce 43
+	GE  reduce 43
+	')'  reduce 43
+	';'  reduce 43
+	'<'  reduce 43
+	'>'  reduce 43
+	'+'  reduce 43
+	'-'  reduce 43
+
+
+state 83
+	Term : Term '*' Factor .  (45)
+
+	.  reduce 45
+
+
+state 84
+	Term : Term '/' Factor .  (46)
+
+	.  reduce 46
+
+
+state 85
+	OpBoolExpr : BoolExpr .  (29)
+
+	.  reduce 29
+
+
+state 86
+	ForStmt : FOR '(' OpAssignExpr ';' OpBoolExpr . ';' OpAssignExpr ')' Stmt  (26)
+
+	';'  shift 90
+	.  error
+
+
+state 87
+	WhileStmt : WHILE '(' BoolExpr ')' Stmt .  (31)
+
+	.  reduce 31
+
+
+state 88
+	BoolExpr : Expr CompOp Expr .  (35)
+
+	.  reduce 35
+
+
+89: shift/reduce conflict (shift 91, reduce 34) on ELSE
+state 89
+	IfStmt : IF '(' BoolExpr ')' Stmt . ElsePart  (32)
+	ElsePart : .  (34)
+
+	ELSE  shift 91
+	INT  reduce 34
+	FLOAT  reduce 34
+	PRINTLN  reduce 34
+	FOR  reduce 34
+	WHILE  reduce 34
+	IF  reduce 34
+	ID  reduce 34
+	'{'  reduce 34
+	'}'  reduce 34
+	';'  reduce 34
+
+	ElsePart  goto 92
+
+
+state 90
+	ForStmt : FOR '(' OpAssignExpr ';' OpBoolExpr ';' . OpAssignExpr ')' Stmt  (26)
+	OpAssignExpr : .  (28)
+
+	ID  shift 21
+	')'  reduce 28
+
+	AssignExpr  goto 53
+	AssId  goto 34
+	OpAssignExpr  goto 93
+
+
+state 91
+	ElsePart : ELSE . Stmt  (33)
+
+	INT  shift 15
+	FLOAT  shift 16
+	PRINTLN  shift 17
+	FOR  shift 18
+	WHILE  shift 19
+	IF  shift 20
+	ID  shift 21
+	'{'  shift 11
+	';'  shift 23
+	.  error
+
+	CompStmt  goto 24
+	Stmt  goto 94
+	Decleration  goto 26
+	Type  goto 27
+	NullStmt  goto 28
+	AssignStmt  goto 29
+	ForStmt  goto 30
+	WhileStmt  goto 31
+	IfStmt  goto 32
+	AssignExpr  goto 33
+	AssId  goto 34
+
+
+state 92
+	IfStmt : IF '(' BoolExpr ')' Stmt ElsePart .  (32)
+
+	.  reduce 32
+
+
+state 93
+	ForStmt : FOR '(' OpAssignExpr ';' OpBoolExpr ';' OpAssignExpr . ')' Stmt  (26)
+
+	')'  shift 95
+	.  error
+
+
+state 94
+	ElsePart : ELSE Stmt .  (33)
+
+	.  reduce 33
+
+
+state 95
+	ForStmt : FOR '(' OpAssignExpr ';' OpBoolExpr ';' OpAssignExpr ')' . Stmt  (26)
+
+	INT  shift 15
+	FLOAT  shift 16
+	PRINTLN  shift 17
+	FOR  shift 18
+	WHILE  shift 19
+	IF  shift 20
+	ID  shift 21
+	'{'  shift 11
+	';'  shift 23
+	.  error
+
+	CompStmt  goto 24
+	Stmt  goto 96
+	Decleration  goto 26
+	Type  goto 27
+	NullStmt  goto 28
+	AssignStmt  goto 29
+	ForStmt  goto 30
+	WhileStmt  goto 31
+	IfStmt  goto 32
+	AssignExpr  goto 33
+	AssId  goto 34
+
+
+state 96
+	ForStmt : FOR '(' OpAssignExpr ';' OpBoolExpr ';' OpAssignExpr ')' Stmt .  (26)
+
+	.  reduce 26
+
+
+State 89 contains 1 shift/reduce conflict.
+
+
+33 terminals, 25 nonterminals
+52 grammar rules, 97 states

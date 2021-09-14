@@ -1,0 +1,150 @@
+MINUS	ALF	    -	
+COMMA	ALF	    ,	
+VAR0        CON         0           
+VAR1        CON         0           
+VAR2        CON         0           
+VAR3        CON         0           
+TEMP        CON         0           
+TEMP2       CON         0           
+FLT         CON         0           
+TENF        CON         10          
+C           CON         262144      
+C2          CON         16777216    
+ZERO        CON         0           
+LARGE       CON         0           
+N           CON         0           
+NUM1        CON         0           
+NUM2        CON         0           
+N30         CON         30          
+LENGTH      CON         10          
+M           CON         0           
+LIMIT       CON         0           
+NUM3        CON         0           
+NUM4        CON         0           
+POS         CON         0           
+POS1        CON         0           
+CFLAG       CON         1           
+DECFLAG     CON         0           
+CNT         CON         5           
+MIDEN       CON         0           
+STACK       ORIG        *+30        
+OUTP        ORIG        *+24        
+
+START       NOP         
+            LDA         TENF        
+            FLOT                    
+            STA         TENF        
+            LDA         C2          
+            FLOT                    
+            STA         C2          
+            LDA         C           
+            FLOT                    
+            STA         C           
+            LDA         =0=         
+            CHAR                    
+            STA         ZERO        
+            LDA         VAR3        
+            STA         STACK+0     
+
+            LDA         =12=        
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         VAR3        
+            STA         STACK+0     
+
+            LDA         VAR2        
+            STA         STACK+0     
+
+            LDA         =15224=     
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         VAR2        
+            STA         STACK+0     
+
+            LDA         VAR1        
+            STA         STACK+0     
+
+            LDA         =25=        
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         VAR1        
+            STA         STACK+0     
+
+            LDA         VAR0        
+            STA         STACK+0     
+
+            LDA         VAR3        
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         VAR0        
+            STA         STACK+0     
+
+            LDA         VAR2        
+            STA         STACK+0     
+
+            LDA         VAR0        
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         TEMP        
+            LDA         STACK+0     
+            CMPA        TEMP        
+            JLE         1F          
+            LDA         VAR0        
+            STA         STACK+0     
+
+            LDA         VAR2        
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         VAR0        
+            STA         STACK+0     
+
+            JMP         2F          
+1H          NOP                     
+2H          NOP                     
+            LDA         VAR1        
+            STA         STACK+0     
+
+            LDA         VAR0        
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         TEMP        
+            LDA         STACK+0     
+            CMPA        TEMP        
+            JLE         1F          
+            LDA         VAR0        
+            STA         STACK+0     
+
+            LDA         VAR1        
+            STA         STACK+1     
+
+            LDA         STACK+1     
+            STA         VAR0        
+            STA         STACK+0     
+
+            JMP         2F          
+1H          NOP                     
+2H          NOP                     
+            LDA         VAR0        
+            STA         STACK+0     
+
+            LDA         STACK+0     
+            CHAR                    
+            STA         OUTP+1      
+            STX         OUTP+2      
+            JANN        M0          
+            LDA         MINUS       
+            STA         OUTP        
+M0          OUT         OUTP(18)    
+            JBUS        *(18)       
+            LDA         MIDEN       
+            STA         OUTP+1      
+            STA         OUTP+2      
+TELOS       HLT         
+            END         START
