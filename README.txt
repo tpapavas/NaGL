@@ -26,4 +26,6 @@ Language's functionality:
 -for, while loops
 -print function (println)
 
+Compiler was based on the code in "base code" folder. This code was given by my professor Georgios Makris.
+
 Have fun!
