@@ -1,0 +1,534 @@
+%{
+
+/* ----------------------------------------------------------- */
+/* New in syd9: read, print.                                   */
+/*          syd9 is divided into defs.h,syd91,syd92 & syd93.c  */
+/* ----------------------------------------------------------- */
+ 
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+
+#define MHNYMA 0
+
+/* ----------------------------------------------------------- */
+/* --------- Declarations for Syntax-Semantic Analysis ------- */
+/* ----------------------------------------------------------- */
+
+#include "defs.h"
+
+symbol *Cross_Link_Head[MAX_CROSS_LINKS];
+
+typedef struct hash_tab {
+   int numbsymbols;
+   symbol *table[SYM_TABLE_SIZE];
+} HASH_TAB;
+
+HASH_TAB ht;
+
+int TopOfStack=-1;
+symbol *vs[30];
+
+symbol *Symbol_free=NULL; /* -- Symbol-list of recycled symbols -- */
+symbol *p,*p1,*p2,*p3;
+
+AstNode *TreeRoot;
+
+%}
+
+%union
+{
+    int   yint;
+    char  ystr[81];
+    struct AstNode_tag *stnode;
+}
+
+%token <yint> AND ELSE IF INT NOT OR PRINT READ WHILE
+%token <ystr> DEC_CONST
+%token <ystr> '(' ')' '{' '}'
+%token <ystr> '*' '/' '%' '+' '-' '=' ';' ','
+%token <ystr> GE '>' LE '<' NE EQ
+%token <ystr> ID
+
+%type <stnode> Program DeclSeq Declaration StdType Declarator
+%type <stnode> Dcltr1OrMore DcltrSeq Name 
+%type <stnode> StmtSeq Stmt0OrMore Statement BasicStmt BalStmt 
+%type <stnode> CompStmt eStmt NullStmt ReadStmt PrintStmt
+
+%type <stnode> PrimExpr Var Literal ParenExpr PrefixExpr MultExpr
+%type <stnode> AddExpr RelExpr AssignExpr Expr  
+
+%%
+
+Program            : /* EMPTY */
+                     {
+#if MHNYMA
+                        printf("/0\n");
+#endif
+                        TreeRoot=MkNode(astEmptyProgram,NULL,NULL,NULL,NULL,NULL);
+                     }
+                   | '{'  DeclSeq StmtSeq  '}'
+                     {
+#if MHNYMA
+                        printf("/1\n");
+#endif
+                        TreeRoot=MkNode(astProgram,NULL,$2,$3,NULL,NULL);
+                     }
+                   ;
+DeclSeq            : /* EMPTY */
+                     {
+#if MHNYMA
+                        printf("/2\n");
+#endif
+                        $$=MkNode(astEmptyDeclSeq,NULL,NULL,NULL,NULL,NULL);
+                     }
+                   | DeclSeq  Declaration
+                     { 
+#if MHNYMA
+                        printf("/3\n");
+#endif
+                        $$=MkNode(astDeclSeq,NULL,$1,$2,NULL,NULL);
+                     }
+                   ;
+Declaration        : StdType  DcltrSeq ';'
+                     { 
+#if MHNYMA
+                        printf("/4\n");
+#endif
+                        $$=MkNode(astDecl,NULL,$1,$2,NULL,NULL);
+                        p2=pop_vs();
+                        p1=pop_vs();
+                        cpy_attributes(p2,p1);
+                        p2=reverse_cross_links(p2);
+                        Link_Symbol_to_Cross_Link(p2);
+                        add_symbols_to_table(p2);
+                        discard_symbol(p1);
+                     }
+                   ;
+StdType            : INT    	
+                     { 
+#if MHNYMA
+                        printf("/5\n");
+#endif
+                        $$=MkNode(INT,NULL,NULL,NULL,NULL,NULL); 
+                        p1=new_symbol("");
+                        set_class_types(p1,$1);
+                        p1->disposable=TRUE;
+                        push_vs(p1);
+                     }
+                   ;
+DcltrSeq           : Dcltr1OrMore 
+                     { 
+#if MHNYMA
+                        printf("/6\n");
+#endif
+                        $$=$1;
+                     }
+		       ;
+Dcltr1OrMore       : Declarator
+                     { 
+#if MHNYMA
+                        printf("/7\n");
+#endif
+                        $$=$1;
+                     }
+                   | Dcltr1OrMore ',' Declarator
+                     {  
+#if MHNYMA
+                        printf("/8\n");
+#endif
+                        $$=MkNode(astDcltrSeq,NULL,$1,$3,NULL,NULL);
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        p3->Next_in_Cross_Link=p1;
+                        push_vs(p3);
+                     }
+                   ;
+Declarator         : Name 
+                     { 
+#if MHNYMA
+                        printf("/9\n");
+#endif
+                        $$=$1;
+                     }
+		       ;
+Name               : ID
+                     { 
+#if MHNYMA
+                        printf("/10\n");
+#endif
+                        p1=new_symbol($1);
+                        $$=MkNode(astVarDcltr,p1,NULL,NULL,NULL,NULL);
+                        push_vs(p1); 
+                     }
+                   ;
+StmtSeq            : Stmt0OrMore
+                     { 
+#if MHNYMA
+                        printf("/11\n");
+#endif
+                        (void)pop_vs();
+                        $$=$1;
+                     }
+		       ;
+Stmt0OrMore        : /* EMPTY */
+                     { 
+#if MHNYMA
+                        printf("/12\n");
+#endif
+                        $$=MkNode(astEmptyStmtSeq,NULL,NULL,NULL,NULL,NULL); 
+                        push_vs(NULL);
+                     }
+                   | Stmt0OrMore  Statement
+                     { 
+#if MHNYMA
+                        printf("/13\n");
+#endif
+                        $$=MkNode(astStmtSeq,NULL,$1,$2,NULL,NULL); 
+                        (void)pop_vs();
+                        (void)pop_vs();
+                        push_vs(NULL);
+                     }
+                   ;
+Statement          : BalStmt
+                     { 
+#if MHNYMA
+                        printf("/14\n");
+#endif
+                        $$=$1; 
+                     }
+                   ;
+BalStmt            : BasicStmt
+                     { 
+#if MHNYMA
+                        printf("/15\n");
+#endif
+                        $$=$1; 
+                     }
+		       ;
+BasicStmt          : eStmt	
+                     { 
+#if MHNYMA
+                        printf("/16\n");
+#endif
+                        $$=$1;
+                     }
+                   | ReadStmt
+                     { 
+#if MHNYMA
+                        printf("13\n");
+#endif
+                        $$=$1;
+                     }
+                   | PrintStmt
+                     {  
+#if MHNYMA
+                        printf("14\n");
+#endif
+                        $$=$1;
+                     }
+                   | NullStmt
+                     {  
+#if MHNYMA
+                        printf("/17\n");
+#endif
+                        $$=$1;
+                     }
+                   | CompStmt
+                     {  
+#if MHNYMA
+                        printf("/18\n");
+#endif
+                        $$=$1;
+                     }
+                   ;
+eStmt	             : Expr ';'
+                     { 
+#if MHNYMA
+                        printf("/19\n");
+#endif
+                        $$=MkNode(astExprStmt,NULL,$1,NULL,NULL,NULL); 
+                     }
+                   ;
+ReadStmt           : READ  '('  PrimExpr  ')'  ';'
+                     { 
+#if MHNYMA
+                        printf("36\n");
+#endif
+                        $$=MkNode(astReadStmt,NULL,$3,NULL,NULL,NULL);
+                        p3=pop_vs();
+                        check_read(p3);
+                        push_vs(NULL);
+                     }
+		       ;
+PrintStmt          : PRINT  '('  Expr  ')'  ';'
+                     { 
+#if MHNYMA
+                        printf("37\n");
+#endif
+                        $$=MkNode(astPrintStmt,NULL,$3,NULL,NULL,NULL);
+                        p3=pop_vs();
+                        check_print(p3);
+                        push_vs(NULL);
+                     }
+		       ;
+NullStmt           : /* EMPTY */ ';'
+                     { 
+#if MHNYMA
+                        printf("/20\n");
+#endif
+                        $$=MkNode(astNullStmt,NULL,NULL,NULL,NULL,NULL);
+                        push_vs(NULL);
+                     }
+		       ;
+CompStmt           : '{'  Stmt0OrMore  '}'
+                     { 
+#if MHNYMA
+                        printf("/21\n");
+#endif
+                        $$=$2; 
+                     }
+		       ;
+PrimExpr           : Literal
+                     { 
+#if MHNYMA
+                        printf("/22\n");
+#endif
+                        $$=$1; 
+                     }
+                   | Var
+                     { 
+#if MHNYMA
+                        printf("/23\n");
+#endif
+                        $$=$1;
+                     }
+                   ;
+Literal            : DEC_CONST
+                     {  
+#if MHNYMA
+                        printf("/24\n");
+#endif
+                        p1=new_symbol($1);
+                        p1->typos=INT;
+                        p1->disposable=FALSE;
+                        p1->lvalue=FALSE;
+                        p1->timi=atoi($1);
+                        push_vs(p1);
+                        $$=MkNode(astDecimConst,p1,NULL,NULL,NULL,NULL);
+                     }
+                   ;
+Var                : ID
+                     {
+#if MHNYMA
+                        printf("/25\n");
+#endif
+                        p1=findsymb($1);
+                        if(!p1) {
+                           printf("Identifier not declared\n");
+                           exit(1);
+                        }
+                        $$=MkNode(astId,p1,NULL,NULL,NULL,NULL);
+                        p1=create_id(p1);
+                        push_vs(p1);
+                     }
+		       ;
+ParenExpr          : PrimExpr
+                     {
+#if MHNYMA
+                        printf("/26\n");
+#endif
+                        $$=$1; 
+                     }
+                   | '('  Expr  ')'
+                     { 
+#if MHNYMA
+                        printf("/27\n");
+#endif
+                        $$=$2; 
+                     }
+                   ;
+PrefixExpr         : ParenExpr
+                     { 
+#if MHNYMA
+                        printf("/28\n");
+#endif
+                        $$=$1; 
+                     }
+                   ;
+MultExpr           : PrefixExpr
+                     { 
+#if MHNYMA
+                        printf("/29\n");
+#endif
+                        $$=$1; 
+                     }
+                   | MultExpr '*' PrefixExpr
+                     {   
+#if MHNYMA
+                        printf("/30\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astMult,NULL,$1,$3,NULL,NULL);
+                        p=check_multop(p1,p3);
+                        push_vs(p);
+                     }
+                   | MultExpr '/' PrefixExpr
+                     { 
+#if MHNYMA
+                        printf("/31\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astDiv,NULL,$1,$3,NULL,NULL);
+                        p=check_divop(p1,p3);
+                        push_vs(p);
+                     }
+                   | MultExpr '%' PrefixExpr
+                     { 
+#if MHNYMA
+                        printf("/32\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astMod,NULL,$1,$3,NULL,NULL);
+                        p=check_modop(p1,p3);
+                        push_vs(p);
+                     }
+                   ;
+AddExpr            : MultExpr
+                     { 
+#if MHNYMA
+                        printf("/33\n");
+#endif
+                        $$=$1; 
+                     }
+		       | AddExpr '+' MultExpr
+                     { 
+#if MHNYMA
+                        printf("/34\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astAdd,NULL,$1,$3,NULL,NULL);
+                        p=check_addop(p1,p3);
+                        push_vs(p);
+                     }
+		       | AddExpr '-' MultExpr
+                     { 
+#if MHNYMA
+                        printf("/35\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astSub,NULL,$1,$3,NULL,NULL);
+                        p=check_subop(p1,p3);
+                        push_vs(p);
+                     }
+                   ;
+RelExpr            : AddExpr
+                     { 
+#if MHNYMA
+                        printf("/36\n");
+#endif
+                        $$=$1; 
+                     }
+		       | RelExpr '>' AddExpr
+                     { 
+#if MHNYMA
+                        printf("/37\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astGreater,NULL,$1,$3,NULL,NULL);
+                        p=check_gtop(p1,p3);
+                        push_vs(p);
+                     }
+		       | RelExpr GE AddExpr
+                     { 
+#if MHNYMA
+                        printf("/38\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astGrEq,NULL,$1,$3,NULL,NULL);
+                        p=check_geop(p1,p3);
+                        push_vs(p);
+                     }
+		       | RelExpr '<' AddExpr
+                     { 
+#if MHNYMA
+                        printf("/39\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astLess,NULL,$1,$3,NULL,NULL);
+                        p=check_ltop(p1,p3);
+                        push_vs(p);
+                     }
+		       | RelExpr LE AddExpr
+                     { 
+#if MHNYMA
+                        printf("/40\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astLeEq,NULL,$1,$3,NULL,NULL);
+                        p=check_leop(p1,p3);
+                        push_vs(p);
+                     }
+		       | RelExpr EQ AddExpr
+                     { 
+#if MHNYMA
+                        printf("/41\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astEq,NULL,$1,$3,NULL,NULL);
+                        p=check_eqop(p1,p3);
+                        push_vs(p);
+                     }
+		       | RelExpr NE AddExpr
+                     { 
+#if MHNYMA
+                        printf("/42\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astNotEq,NULL,$1,$3,NULL,NULL);
+                        p=check_neop(p1,p3);
+                        push_vs(p);
+                     }
+                   ;
+AssignExpr	       : RelExpr
+                     { 
+#if MHNYMA
+                        printf("/43\n");
+#endif
+                        $$=$1; 
+                     }
+                   | PrimExpr '=' Expr
+                     { 
+#if MHNYMA
+                        printf("/44\n");
+#endif
+                        p3=pop_vs();
+                        p1=pop_vs();
+                        $$=MkNode(astAssign,NULL,$1,$3,NULL,NULL);
+                        p=check_assignment(p1,p3);
+                        push_vs(p);
+                     }
+		       ;
+Expr               : AssignExpr
+                     { 
+#if MHNYMA
+                        printf("/45\n");
+#endif
+                        $$=$1;
+                     }
+                   ;
+%%
+
+#include "syd92"

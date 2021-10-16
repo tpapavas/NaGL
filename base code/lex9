@@ -1,0 +1,135 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include "defs.h"
+#include "y.tab.h"
+
+#define N  9
+%}
+
+%%
+
+[0-9]+                      {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(DEC_CONST);
+                            }
+"*"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('*');
+                            }
+"/"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('/');
+                            }
+"%"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('%');
+                            }
+"+"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('+');
+                            }
+"-"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('-');
+                            }
+"="                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('=');
+                            }
+">"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('>');
+                            }
+">="                        {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(GE);
+                            }
+"<"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('<');
+                            }
+"<="                        {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(LE);
+                            }
+"=="                        {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(EQ);
+                            }
+"<>"                        {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(NE);
+                            }
+"("                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('(');
+                            }
+")"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(')');
+                            }
+"{"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('{');
+                            }
+"}"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return('}');
+                            }
+","                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(',');
+                            }
+";"                         {
+                               printf("%s",yytext);
+                               strcpy(yylval.ystr,yytext);
+                               return(';');
+                            }
+[a-zA-Z]([a-zA-Z]|[0-9])*   {  int i;
+
+                               printf("%s",yytext);
+                               i=id_or_keyword(yytext);
+                               if(i==ID) 
+                                  strcpy(yylval.ystr,yytext);
+                               else 
+                                  yylval.yint=i;
+                               return(i);
+                            }
+[ \f\n\r\t]+                printf("%s",yytext); 
+.                           {
+                               printf("€š¤à©«¦ª ®˜¨˜¡«ž¨˜ª %s\n",yytext);
+                            }    
+
+%%
+
+static char *kid[N]={"and","else","if","int","not","or","print","read","while"};
+static int kval[N]={AND,ELSE,IF,INT,NOT,OR,PRINT,READ,WHILE};
+
+int id_or_keyword(char *s)
+{  int i,k;
+
+   for(i=0; (i < N) && (strcmp(s,kid[i]) != 0); i++);
+   if(i < N)
+      return kval[i];
+   else
+      return ID;
+}
